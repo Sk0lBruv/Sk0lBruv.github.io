@@ -24,37 +24,47 @@ let currentPlayer = 'X';
 const cells = document.querySelectorAll('.cell');
 const statusDiv = document.getElementById('status');
 
-// Join or create a game session
 function joinGame() {
   const gamesRef = ref(database, 'games');
   
+  // Fetch the list of games from Firebase
   get(gamesRef).then((snapshot) => {
     const games = snapshot.val();
     let found = false;
 
-    // Check for an available game to join
+    // Check if there are any games with only one player (waiting for a second player)
     for (let id in games) {
-      if (games[id].players.length === 1) {
+      if (games[id].players && games[id].players.length === 1) {
         gameId = id;
-        player = 'O';
-        const playersRef = ref(database, `games/${id}/players`);
-        push(playersRef, player);
-        statusDiv.innerText = "You're playing as O";
+        player = 'O';  // Join as 'O'
+        
+        // Add the second player to the game
+        const playersRef = ref(database, `games/${gameId}/players`);
+        push(playersRef, player).then(() => {
+          statusDiv.innerText = "You're playing as O";
+        });
         found = true;
         break;
       }
     }
 
-    // If no available game, create a new one
+    // If no game found, create a new one
     if (!found) {
-      gameId = push(gamesRef, { players: ['X'], board: Array(9).fill('') }).key;
-      player = 'X';
+      gameId = push(gamesRef, {
+        players: ['X'],   // First player is 'X'
+        board: Array(9).fill('')  // Empty game board
+      }).key;
+      player = 'X';  // Join as 'X'
       statusDiv.innerText = "Waiting for opponent...";
     }
 
+    // Start syncing the game
     startGame();
+  }).catch((error) => {
+    console.error("Error joining/creating game:", error);
   });
 }
+
 
 // Game logic
 function startGame() {
