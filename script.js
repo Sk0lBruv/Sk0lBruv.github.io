@@ -110,15 +110,20 @@ function startGame() {
 // Making a move
 function makeMove(index) {
   const gameRef = ref(database, `games/${gameId}`);
-  
+
   get(gameRef).then((snapshot) => {
     const gameData = snapshot.val();
     const board = gameData.board;
 
-    // If the cell is empty, make the move
-    if (!board[index]) {
+    // Make sure the selected cell is empty and it's the current player's turn
+    if (!board[index] && currentPlayer === player) {
       board[index] = player;
-      update(gameRef, { board });
+      
+      // Update the board in Firebase
+      update(gameRef, { board }).then(() => {
+        // Switch turn to the next player
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      });
     }
   });
 }
