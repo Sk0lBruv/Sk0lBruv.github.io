@@ -26,81 +26,86 @@ const statusDiv = document.getElementById('status');
 
 function joinGame() {
   const gamesRef = ref(database, 'games');
-  
-  // Fetch the list of games from Firebase
+
+  // Fetch all games
   get(gamesRef).then((snapshot) => {
     const games = snapshot.val();
     let found = false;
 
-    // Check if there are any games with only one player (waiting for a second player)
+    // Iterate over all games to find an open one
     for (let id in games) {
       if (games[id].players && games[id].players.length === 1) {
         gameId = id;
-        player = 'O';  // Join as 'O'
+        player = 'O';  // Join as player 'O'
+        const playersRef = ref(database, `games/${gameId}/players`);
         
         // Add the second player to the game
-        const playersRef = ref(database, `games/${gameId}/players`);
         push(playersRef, player).then(() => {
           statusDiv.innerText = "You're playing as O";
+          console.log("Joined game as O, Game ID:", gameId);
+          startGame();
         });
+
         found = true;
         break;
       }
     }
 
-    // If no game found, create a new one
+    // If no open game found, create a new one
     if (!found) {
       gameId = push(gamesRef, {
-        players: ['X'],   // First player is 'X'
-        board: Array(9).fill('')  // Empty game board
+        players: ['X'],  // Start game as player 'X'
+        board: Array(9).fill('')  // Initialize empty board
       }).key;
-      player = 'X';  // Join as 'X'
-      statusDiv.innerText = "Waiting for opponent...";
-    }
 
-    // Start syncing the game
-    startGame();
+      player = 'X';  // You're the first player, so you're 'X'
+      statusDiv.innerText = "Waiting for opponent...";
+      console.log("Created new game as X, Game ID:", gameId);
+      startGame();
+    }
   }).catch((error) => {
     console.error("Error joining/creating game:", error);
   });
 }
 
 
-// Game logic
+
 function startGame() {
   const gameRef = ref(database, `games/${gameId}`);
 
-  // Sync moves in real-time
+  // Listen for real-time changes to the game state
   onValue(gameRef, (snapshot) => {
     const gameData = snapshot.val();
     const board = gameData.board;
+    const players = gameData.players;
+
+    console.log("Current game data:", gameData);
 
     // Update the game board in the UI
     cells.forEach((cell, index) => {
       cell.innerText = board[index];
     });
 
-    // Check if we have a winner
+    // If both players are in the game, start
+    if (players.length === 2) {
+      if (currentPlayer === 'X') {
+        statusDiv.innerText = "Player X's turn";
+      } else {
+        statusDiv.innerText = "Player O's turn";
+      }
+    } else {
+      statusDiv.innerText = "Waiting for another player...";
+    }
+
+    // Check if there’s a winner
     if (checkWinner(board)) {
       statusDiv.innerText = `Player ${currentPlayer} wins!`;
     } else if (board.every(cell => cell)) {
       statusDiv.innerText = "It's a draw!";
-    } else {
-      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-      statusDiv.innerText = `Player ${currentPlayer}'s turn`;
     }
   });
-
-  // Handle clicking on a cell
-  cells.forEach(cell => {
-    cell.addEventListener('click', () => {
-      if (!cell.innerText && currentPlayer === player) {
-        const index = cell.getAttribute('data-index');
-        makeMove(index);
-      }
-    });
-  });
 }
+
 
 // Making a move
 function makeMove(index) {
