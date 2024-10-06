@@ -1,37 +1,97 @@
+/* General Styles */
 body {
-  font-family: 'Arial', sans-serif;
-  text-align: center;
-  background-color: #f0f0f0;
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+    overflow-x: hidden;
+}
+
+header {
+    text-align: center;
+    padding: 50px 0;
+    background: linear-gradient(45deg, #ff0000, #000000);
+    background-size: 400% 400%;
+    animation: gradientAnimation 10s ease infinite;
+}
+
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 h1 {
-  margin-top: 20px;
+    margin: 0;
+    font-size: 3em;
 }
 
-#game {
-  display: grid;
-  grid-template-columns: repeat(3, 100px);
-  grid-template-rows: repeat(3, 100px);
-  gap: 10px;
-  justify-content: center;
-  margin-top: 30px;
+/* Game Grid */
+.game-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px;
 }
 
-.cell {
-  width: 100px;
-  height: 100px;
-  background-color: #fff;
-  border: 2px solid #000;
-  font-size: 36px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
+.game-cube {
+    width: 250px;
+    height: 250px;
+    margin: 15px;
+    background-color: #1a1a1a;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
 }
 
-#status {
-  margin-top: 20px;
-  font-size: 24px;
+.game-cube:hover {
+    transform: rotateY(360deg);
+}
+
+.game-cube img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.game-title {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    background-color: rgba(255, 0, 0, 0.8);
+    padding: 10px 0;
+    box-sizing: border-box;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #ff0000;
+    border-radius: 5px;
+}
+
+/* AOS Animations */
+[data-aos] {
+    opacity: 0;
+    transition-property: transform, opacity;
+    transition-duration: 1s;
+}
+
+[data-aos].aos-animate {
+    opacity: 1;
+    transform: none;
 }
