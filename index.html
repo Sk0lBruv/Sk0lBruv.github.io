@@ -1,1 +1,29 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game Website</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Include AOS Library for scroll animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome to the Game Hub</h1>
+    </header>
+    <section class="game-grid">
+        <div class="game-cube" data-aos="fade-up" onclick="playGame('game1.html')">
+            <img src="images/game1.jpg" alt="Game 1">
+            <div class="game-title">Game 1</div>
+        </div>
+        <div class="game-cube" data-aos="fade-up" onclick="playGame('game2.html')">
+            <img src="images/game2.jpg" alt="Game 2">
+            <div class="game-title">Game 2</div>
+        </div>
+        <!-- Add more game cubes as needed -->
+    </section>
+    <!-- Include AOS Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
